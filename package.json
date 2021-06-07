@@ -1,0 +1,24 @@
+{
+  "name": "motemote",
+  "version": "1.0.0",
+  "description": "twinch binch",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telperion/motemote.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/telperion/motemote/issues"
+  },
+  "homepage": "https://github.com/telperion/motemote#readme",
+  "dependencies": {
+    "http-server": "^0.12.3",
+    "tmi.js": "^1.8.3"
+  }
+}
