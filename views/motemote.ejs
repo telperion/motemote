@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>motemote</title>
+    </head>
+    <body>
+        <div>
+            <h1 id="errorHeader" style="color: grey;" hidden></h1>
+            <h3 id="errorDesc" style="color: grey;" hidden></h3>
+        </div>
+
+        <canvas
+            id="canvas"
+            width=  <%= typeof cw != 'undefined' ? cw : 1280 %>
+            height= <%= typeof ch != 'undefined' ? ch :  720 %>
+        ></canvas>
+
+        <script src="/js/tmi.min.js"></script>
+        <script>
+            var gw =        <%= typeof       gw != 'undefined' ?       gw : 48 %>;
+            var gh =        <%= typeof       gh != 'undefined' ?       gh : 27 %>;            
+            var lifespan =  <%= typeof lifespan != 'undefined' ? lifespan :  1 %>;
+            var ips =       <%= typeof      ips != 'undefined' ?      ips : 10 %>;
+            var fps =       <%= typeof      fps != 'undefined' ?      fps : 60 %>;
+            var channel =   '<%= channel %>';
+        </script>
+        <script src="/js/motemote.js"></script>
+    </body>
+</html>

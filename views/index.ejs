@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            h1 {font-size: 1.8vw;}
+            p, li {font-size: 1.2vw;}
+        </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>motemote</title>
+    </head>
+    <body>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 30%;">
+            <canvas id="canvas" width=1280 height=720></canvas>
+            <script src="/js/tmi.min.js"></script>
+            <script>
+                var lifespan = 3;
+                var fps = 30;
+                var channel = 'gamesdonequick';
+            </script>
+            <script src="/js/motemote.js"></script>
+        </div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <h1>Welcome to motemote.</h1>
+            <p>
+                Examples:
+                <ul>
+                    <li><b>motemote.telp.gg/channelname</b> - default 1280x720 frame with 48x27 grid</li>
+                    <li>motemote.telp.gg/channelname<b>?cw=960&ch=540</b> - 960x540 frame with 48x27 grid</li>
+                    <li>motemote.telp.gg/channelname<b>?gw=32&gh=18</b> - 1280x720 frame with 32x18 grid</li>
+                    <li>motemote.telp.gg/channelname<b>?ips=1</b> - Conway's Game of Life runs at 1 FPS (default is 10 FPS)</li>
+                    <li>motemote.telp.gg/channelname<b>?fps=5</b> - animation runs at 5 FPS (default is 60 FPS)</li>
+                    <li>motemote.telp.gg/channelname<b>?lifespan=0.5</b> - cells age out after 1/2 sec (default is 1 sec)</li>
+                </ul>
+            </p>
+        </div>
+    </body>
+</html>
