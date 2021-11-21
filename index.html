@@ -7,19 +7,21 @@
     </head>
     <body>
         <div>
-            <h1 id="count" hidden></h1>
-            <h3 id="botmsg" hidden></h3>
-            <img class="emote" src="" hidden></img>
-            <img class="emote" src="" hidden></img>
-            <img class="emote" src="" hidden></img>
-            <img class="emote" src="" hidden></img>
-            <img class="emote" src="" hidden></img>
-            <img class="emote" src="" hidden></img>
+            <h1 id="errorHeader" style="color: grey;" hidden></h1>
+            <h3 id="errorDesc" style="color: grey;" hidden></h3>
         </div>
 
         <canvas id="canvas" width=1280 height=720></canvas>
 
         <script src="tmi.min.js"></script>
+        <script>
+            var gw = 48;
+            var gh = 27;            
+            var lifespan = 1;
+            var ips = 10;
+            var fps = 60;
+            var channel = 'telepron';
+        </script>
         <script src="motemote.js"></script>
     </body>
 </html>

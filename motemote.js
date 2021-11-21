@@ -1,30 +1,14 @@
-const eCount  = document.querySelector('#count');
-const eBotMsg = document.querySelector('#botmsg');
-const eImages = document.querySelectorAll('.emote');
+// Identify the DOM elements for error reporting.
+const eErrorHeader = document.querySelector('#errorHeader');
+const eErrorDesc   = document.querySelector('#errorDesc');
 
-const client = new tmi.Client({
-  connection: {
-    secure: true,
-    reconnect: true
-  },
-  channels: [ 'telepron' ]
-});
-
-client.connect();
-
-// Grid variables
-var grid = [];
-var gw = 48;               // SQUARES ACROSS
-var gh = 27;               // SQUARES TALL
-var gt = 1;                // LIFESPAN (seconds)
-for (x = 0; x < gw; x++)
+function ReportError(header, desc)
 {
-  for (y = 0; y < gh; y++)
-  {
-    // id: twitch emote ID
-    // age: progression thru lifetime (0 = birth, 1 = death)
-    grid[x*gh + y] = {'id': -1, 'age': 0, 'front': false};
-  }
+  eErrorHeader.innerHTML = header;
+  eErrorDesc.innerHTML = desc;
+
+  eErrorHeader.hidden = false;
+  eErrorDesc.hidden = false;
 }
 
 // Canvas variables/attributes
@@ -33,10 +17,52 @@ var ctx = canvas.getContext("2d");
 var cw = canvas.width;
 var ch = canvas.height;
 
+// Grid variables
+var grid = [];
+var gw = gw || 48;                  // SQUARES ACROSS
+var gh = gh || 27;                  // SQUARES TALL
+
+// Timing variables
+var lifespan = lifespan || 1;       // LIFESPAN (seconds)
+var ips = ips || 10;                // ITERATIONS (per second)
+var fps = fps || 60;                // FRAMES (per second)
+
+// Who's streaming?
+var channel = channel || '';        // CHANNEL NAME
+
+if (!channel) {ReportError(`No channel name provided`, 'When instantiating the browser source, select a channel.')}
+
+// Connect to the streamer's chat.
+const client = new tmi.Client({
+  connection: {
+    secure: true,
+    reconnect: true
+  },
+  channels: [ channel ]
+});
+
+client.connect();
+if (!client) {ReportError(`Couldn't connect to channel "${channel}"`, '')}
+
+// Initialize emote grid.
+for (x = 0; x < gw; x++)
+{
+  for (y = 0; y < gh; y++)
+  {
+    // id: twitch emote ID
+    // age: progression thru lifetime (0 = birth, 1 = death)
+    // front: whether it's on the "frontline"
+    //        (part of the most recent iteration)
+    grid[x*gh + y] = {'id': -1, 'age': 0, 'front': false};
+  }
+}
+
+// Space allotted for each emote in pixels
 var sw = cw / gw;
 var sh = ch / gh;
 
-// Life units
+// "Beasts" (lifeforms)
+// Usually works best if they have a movement speed, e.g. gliders.
 var beasts = [
 //  [[0, 0], [0, 1], [1, 0], [1, 1]],             // still life: block
 //  [[0, 0], [0, 1], [1, 0], [1, 1]],             // still life: block
@@ -52,21 +78,30 @@ var beasts = [
   [[2, 1], [1, 0], [0, 0], [0, 1], [0, 2]],     // glider
 ]
 
-// Load a new image
-// IMPORTANT!!! You must give the image time to load by using img.onload!
+// Cache a few emotes to save on loading times.
 var emotesKnown = {};
 
 let count = 0;
 let emoteIDs = [];
 
+// Parse all incoming messages looking for emotes.
+// So far, only twitch "official" emotes are identified.
+// TODO: FrankerFaceZ? or whatever thing the kids use these days??
 client.on('message', (channel, tags, message, self) => {
   if (self) return;
 
+  // What's in the message?
   const { username, emotes } = tags;
   console.log(`${tags['display-name']}: ${message}`);
 
   if (Object.keys(emotes).length > 0)
   {    
+    // Spawn one "beast" (Conway's Lifeform) per message.
+    // This could be per-emote, but I think that would lead to clutter...
+    // Although each "beast" occupies multiple grid squares, so we might as
+    // well keep track of which *and* how many emotes are present in the
+    // message, with emotesExpanded.
+    // xOff and yOff determine where in the grid it spawns.
     let beast = beasts[Math.floor(Math.random() * beasts.length)];
     let xOff = Math.floor(Math.random() * gw);
     let yOff = Math.floor(Math.random() * gh);
@@ -74,54 +109,71 @@ client.on('message', (channel, tags, message, self) => {
 
     for (id in emotes)
     {
+      // Load each emote locally for use in the drawing routine.
       if (!(id in emotesKnown))
       {
+        // Only load emotes that are new (duplicates would be so taxing...)
         console.log(`${id}: ${emotes[id]}`);
+        // NOTE: the image has to have enough time to load before drawing!
+        // I think this may be causing occasional crashes as it stands now.
+        // Need to monitor img.onload...
         emotesKnown[id] = new Image();
         emotesKnown[id].src = `https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`
       }
 
       for (substrIndex in emotes[id])
       {
+        // All emote occurrences go in emotesExpanded.
         emotesExpanded.push(id);
       }
     }
     
     for (cell in beast)
     {
+      // Offset each cell of the beast.
       let x = (beast[cell][0] + xOff) % gw;
       let y = (beast[cell][1] + yOff) % gh;
-      grid[x*gh + y] = {'id': emotesExpanded[cell % emotesExpanded.length], 'age': 0, 'hl': 0, 'front': true};
+      // Update the grid and fill the cell.
+      grid[x*gh + y] = {
+        'id': emotesExpanded[cell % emotesExpanded.length],
+        'age': 0,
+        'hl': 0,
+        'front': true
+      };
     }
   }
 });
 
+// Time delta monitoring
 var lastTime = -1;
 
+// Callback function to track cell ages
 function updateAge()
 {
-  if (lastTime < 0)
-  {
-    lastTime = Date.now();
-  }
+  // Nab the current time and calculate the delta
+  if (lastTime < 0) {lastTime = Date.now();}
   let thisTime = Date.now();
-  let t = (thisTime - lastTime) * 0.001 / gt;
+  let t = (thisTime - lastTime) * 0.001 / lifespan;
 
   for (i = 0; i < gw*gh; i++)
   {
+    // Update the age of every cell
     grid[i]['age'] += t;
     grid[i]['hl'] += t;
 
     if (grid[i]['age'] > 1)
     {
+      // If the cells are too old to show up,
+      // they no longer need an emote attached.
       grid[i]['id'] = -1;
     }
   }
 
-
+  // Consume the delta
   lastTime = thisTime;
 }
 
+// Callback function to draw out the emotes in the grid
 function updateCanvas()
 { 
   ctx.clearRect(0, 0, cw, ch);
@@ -129,10 +181,20 @@ function updateCanvas()
   {
     for (y = 0; y < gh; y++)
     {
+      // Index into the grid.
+      // Draw each square only if there's an emote identified for it
+      // and the emote is of age.
       g = grid[x*gh + y];
       if ((g['id'] > 0) && (g['age'] >= 0) && (g['age'] < 1))
       {
+        // The emote swells to fill its space as it "ages",
+        // then disappears gradually toward the end of its display life.
+
+        // Use an exponential function to control the size.
+        // Use a quadratic function to control the opacity.
         let s = Math.pow((g['hl'] < 1) ? g['hl'] : 1, 0.1);
+
+        // Context global alpha can be used as long as we save/restore.
         ctx.save();
         ctx.globalAlpha = 1 - g['age']*g['age'];
         ctx.drawImage(emotesKnown[g['id']], (x + 0.5 - 0.5*s) * sw, (y + 0.5 - 0.5*s) * sh, s * sw, s * sh)
@@ -142,14 +204,18 @@ function updateCanvas()
   }
 }
 
+// Callback function to actually play Conway's Game of Life within the grid.
 function updateLife()
 {
+  // The snapshot of the next iteration that we're building.
   var gridNext = [];
 
   for (x = 0; x < gw; x++)
   {
     for (y = 0; y < gh; y++)
     {
+      // Get the coordinates for neighbors by building them
+      // out of adjacent rows and columns.
       let l = (x+gw-1) % gw;
       let r = (x + 1)  % gw;
       let u = (y+gh-1) % gh;
@@ -162,6 +228,8 @@ function updateLife()
         grid[l*gh + d], grid[x*gh + d], grid[r*gh + d]
       ];
 
+      // Not only do we need to track how many neighbors are on the
+      // "frontline", we'll have to make a decision about what emoji to use. 
       let life = 0;
       let idWinner = {};
       for (let n of neighbors)
@@ -169,51 +237,71 @@ function updateLife()
         life += n['front'];
         if (n['id'] >= 0)
         {
+          // We have to make two passes anyway
+          // (initialize emojis present then count),
+          // so let's do the first pass here.
           idWinner[n['id']] = 0;
         }
       }
       
+      // By default, we can just carry over the previous values,
+      // assuming that this cell isn't part of the new frontline.
       //console.log(`${x}, ${y}: ${life}`);
+      gridNext[x*gh + y] = {
+        'id': g['id'],
+        'age': g['age'],
+        'hl': g['hl'],
+        'front': false
+      };
 
+      // Classic Game of Life rules:
+      // either 2 live neighbors and on the front line,
+      //     or 3 live neighbors and stable.
       if (((life == 2) && g['front']) || (life == 3))
       {
         // Most well-represented (and youthful!) ID takes the spot.
+        // This is a funny way of summing the ages to determine that,
+        // buuuuuut I think it works well enough lol
         for (let n of neighbors)
         {
           if (n['id'] >= 0)
           {
+            // The older the age, the smaller the contribution.
             idWinner[n['id']] += 1 / (1 + n['age']);
           }
         }
-        let id = Object.keys(idWinner).reduce(function(a, b){ return idWinner[a] > idWinner[b] ? a : b });
-        let fresh = (id != g['id']) || (g['age'] > 1);
-        gridNext[x*gh + y] = {
-          'id': id,
-          'age': 0,
-          'hl': fresh ? 0 : g['hl'],
-          'front': true
-        };
-      }
-      else
-      {
-        gridNext[x*gh + y] = {
-          'id': g['id'],
-          'age': g['age'],
-          'hl': g['hl'],
-          'front': false
-        };
+        
+        // Okay, *somebody's* gotta go in this cell!
+        if (Object.keys(idWinner).length > 0)
+        {
+          // Max-hold over the array of IDs to determine the youngest.
+          let id = Object.keys(idWinner).reduce(function(a, b){ return idWinner[a] > idWinner[b] ? a : b });
+          // Special tag for "freshening" the cell, when
+          // it's too old but the emote will change.
+          let fresh = (id != g['id']) || (g['age'] > 1);
+          gridNext[x*gh + y] = {
+            'id': id,
+            'age': 0,
+            'hl': fresh ? 0 : g['hl'],
+            'front': true
+          };
+        }
       }
     }
   }
 
+  // Once the next iteration of the grid is fully built, we can upgrade!
   grid = gridNext;
 }
 
+// Age and canvas drawing are both "animation" tasks,
+// but actually iterating life should only be done on its own clock.
 function animateFrame()
 {
   updateAge();
   updateCanvas();
 }
 
-setInterval(updateLife, 100);           // SPEED OF LIFE
-setInterval(animateFrame, 15);          // FRAME RATE
+// Done!
+setInterval(updateLife,   1000 / ips);
+setInterval(animateFrame, 1000 / fps);
