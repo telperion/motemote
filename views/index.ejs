@@ -2,8 +2,9 @@
 <html lang="en">
     <head>
         <style>
-            h1 {font-size: 1.8vw;}
-            p, li {font-size: 1.2vw;}
+            h1 {font-size: 2.0vw; margin: 0;}
+            h2 {font-size: 1.5vw; margin: 0;}
+            p, li {font-size: 1.25vw;}
         </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
@@ -21,16 +22,17 @@
             <script src="/js/motemote.js"></script>
         </div>
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <h1>Welcome to motemote.</h1>
+            <h1>Welcome to motemote:</h1>
+            <h2>a Conway's Game of Life implemented with chat emotes.</h2>
             <p>
                 Examples:
                 <ul>
-                    <li><b>motemote.telp.gg/channelname</b> - default 1280x720 frame with 48x27 grid</li>
-                    <li>motemote.telp.gg/channelname<b>?cw=960&ch=540</b> - 960x540 frame with 48x27 grid</li>
-                    <li>motemote.telp.gg/channelname<b>?gw=32&gh=18</b> - 1280x720 frame with 32x18 grid</li>
-                    <li>motemote.telp.gg/channelname<b>?ips=1</b> - Conway's Game of Life runs at 1 FPS (default is 10 FPS)</li>
-                    <li>motemote.telp.gg/channelname<b>?fps=5</b> - animation runs at 5 FPS (default is 60 FPS)</li>
-                    <li>motemote.telp.gg/channelname<b>?lifespan=0.5</b> - cells age out after 1/2 sec (default is 1 sec)</li>
+                    <li><b>motemote.telp.gg/channel/<u>ch</u></b> - default 1280x720 frame with 48x27 grid</li>
+                    <li>motemote.telp.gg/channel/<u>ch</u><b>?cw=<u>960</u>&ch=<u>540</u></b> - 960x540 frame with 48x27 grid</li>
+                    <li>motemote.telp.gg/channel/<u>ch</u><b>?gw=<u>32</u>&gh=<u>18</u></b> - 1280x720 frame with 32x18 grid</li>
+                    <li>motemote.telp.gg/channel/<u>ch</u><b>?ips=<u>1</u></b> - Conway's Game of Life runs at 1 FPS (default is 10 FPS)</li>
+                    <li>motemote.telp.gg/channel/<u>ch</u><b>?fps=<u>5</u></b> - animation runs at 5 FPS (default is 60 FPS)</li>
+                    <li>motemote.telp.gg/channel/<u>ch</u><b>?lifespan=<u>0.5</u></b> - cells age out after 1/2 sec (default is 1 sec)</li>
                 </ul>
             </p>
         </div>
