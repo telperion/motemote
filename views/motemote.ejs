@@ -2,18 +2,25 @@
 <html lang="en">
     <head>
         <style>
-            h1 {font-size: 2.0vw; margin: 0;}
-            h3 {font-size: 1.5vw; margin: 0;}
-            p, li {font-size: 1.25vw;}
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: rgba(0, 0, 0, 0);
+                margin: 0px auto;
+                overflow: hidden;
+            }
+            h1 {font-size: 2.5vw; margin: 0;}
+            h2 {font-size: 1.33vw; margin: 0;}
+            p, li {font-size: 1.2vw; margin: 1em 0;}
         </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
-        <title>motemote</title>
+        <meta name="description" content="Welcome to motemote: a realtime Conway's Game of Life implemented with twitch chat emotes. Add it as a browser source in OBS and let your viewers do the rest.">
+        <title>motemote: <%= channel %></title>
     </head>
     <body>
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
             <h1 id="errorHeader" style="color: grey;" hidden></h1>
-            <h3 id="errorDesc" style="color: grey;" hidden></h3>
+            <h2 id="errorDesc" style="color: grey;" hidden></h2>
         </div>
 
         <canvas
