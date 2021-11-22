@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/8e42cde0-dcec-47b0-ad4c-9cd095dd86a2/resourceGroups/telp-ws-hosting/providers/Microsoft.Web/sites/motemote",
-    "appService.deploySubpath": "."
-}
