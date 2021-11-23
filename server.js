@@ -23,7 +23,7 @@ app.get('/channel/:channel', function(req, res) {
   let validated = true;
   let errorHeader = 'Check your parameters';
   let errorDesc = 'Some unexpected values were provided:<ul>';
-  let mustBeNumeric = {'cw': [1, 10000], 'ch': [1, 10000], 'gw': [5, 1000], 'gh': [5, 1000], 'lifespan': [0.001, 1000], 'fps': [0.001, 1000], 'ips': [0.001, 1000]};
+  let mustBeNumeric = {'cw': [1, 10000], 'ch': [1, 10000], 'gw': [6, 1000], 'gh': [6, 1000], 'lifespan': [0.001, 1000], 'fps': [0.001, 1000], 'ips': [0.001, 1000]};
   let mustBeIntegral = ['cw', 'ch', 'gw', 'gh'];
   for (let [x, lims] of Object.entries(mustBeNumeric))
   {

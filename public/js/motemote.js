@@ -152,7 +152,7 @@ client.on('message', (channel, tags, message, self) => {
       // Update the grid and fill the cell.
       grid[x*gh + y] = {
         'id': emotesExpanded[cell % emotesExpanded.length],
-        'age': 0,
+        'age': -1.0 / (ips * lifespan), // Allow one iteration of full strength.
         'hl': 0,
         'front': true
       };
@@ -201,7 +201,7 @@ function updateCanvas()
       // Draw each square only if there's an emote identified for it
       // and the emote is of age.
       g = grid[x*gh + y];
-      if ((g['id'] != '') && (g['age'] >= 0) && (g['age'] < 1))
+      if ((g['id'] != '') && (g['age'] <= 1))
       {
         // The emote swells to fill its space as it "ages",
         // then disappears gradually toward the end of its display life.
@@ -212,7 +212,7 @@ function updateCanvas()
 
         // Context global alpha can be used as long as we save/restore.
         ctx.save();
-        ctx.globalAlpha = 1 - g['age']*g['age'];
+        ctx.globalAlpha = (g['age'] >= 0) ? (1 - g['age']*g['age']) : 1;
         ctx.drawImage(emotesKnown[g['id']], (x + 0.5 - 0.5*s) * sw, (y + 0.5 - 0.5*s) * sh, s * sw, s * sh)
         ctx.restore();
       }
@@ -283,7 +283,7 @@ function updateLife()
           if (n['id'] != '')
           {
             // The older the age, the smaller the contribution.
-            idWinner[n['id']] += 1 / (1 + n['age']);
+            idWinner[n['id']] += 1 / (1 + (n['age'] > 0 ? n['age'] : 0));
           }
         }
         
@@ -297,7 +297,7 @@ function updateLife()
           let fresh = (id != g['id']) || (g['age'] > 1);
           gridNext[x*gh + y] = {
             'id': id,
-            'age': 0,
+            'age': -1.0 / (ips * lifespan), // Allow one iteration of full strength.
             'hl': fresh ? 0 : g['hl'],
             'front': true
           };
