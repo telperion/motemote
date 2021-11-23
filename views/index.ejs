@@ -2,32 +2,42 @@
 <html lang="en">
     <head>
         <style>
-            body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-            h1 {font-size: 2.5vw; margin: 0;}
-            h2 {font-size: 1.33vw; margin: 0;}
-            p, li {font-size: 1.2vw; margin: 1em 0;}
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: rgba(0, 0, 0, 0);
+                margin: 0px auto;
+                overflow: hidden;
+            }
+            #container {
+                margin: auto;
+                width: 90%;
+            }
+            h1 {font-size: max(2.5vw, 18px); margin: 0;}
+            h2 {font-size: max(1.33vw, 15px); margin: 0;}
+            p#examples, li {font-size: max(1.2vw, 12px); margin: 1em 0;}
+            p#history {font-size: max(0.8vw, 12px); margin: 1em 0;}
+
+            @media only screen and (min-width: 768px) {
+                #container {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: unset;
+                    transform: translate(-50%, -50%);
+                }
+            }
         </style>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="Welcome to motemote: a realtime Conway's Game of Life implemented with twitch chat emotes. Add it as a browser source in OBS and let your viewers do the rest.">
         <title>motemote</title>
     </head>
     <body>
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 30%;">
-            <canvas id="canvas" width=1280 height=720></canvas>
-            <script src="/js/tmi.min.js"></script>
-            <script>
-                var lifespan = 3;
-                var fps = 30;
-                var channel = 'gamesdonequick';
-            </script>
-            <script src="/js/motemote.js"></script>
-        </div>
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div id="container">
             <h1>Welcome to <u>motemote</u>:</h1>
             <h2>a realtime <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game of Life</a> implemented with <a href="https://www.twitch.tv/">twitch</a> chat emotes.<br>
             Add a URL following the format below as an OBS browser source and let your viewers do the rest 😎</h2>
-            <p>
+            <p id="examples">
                 Examples:
                 <ul>
                     <li><b>motemote.telp.gg/channel/<u>ch</u></b><br/>default 1280x720 frame with 48x27 grid</li>
@@ -37,6 +47,10 @@
                     <li>motemote.telp.gg/channel/<u>ch</u><b>?fps=<u>5</u></b><br/>animation runs at 5 FPS (default is 60 FPS)</li>
                     <li>motemote.telp.gg/channel/<u>ch</u><b>?lifespan=<u>0.5</u></b><br/>cells age out after 1/2 sec (default is 1 sec)</li>
                 </ul>
+            </p>
+            <p id="history">
+                Originally written for <a href="https://clubfantastic.dance/">Club Fantastic</a>'s Season 2 launch stream.<br/>
+                (If you like good music and/or rhythm games, you should totally click this link.)
             </p>
         </div>
     </body>

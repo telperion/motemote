@@ -8,17 +8,30 @@
                 margin: 0px auto;
                 overflow: hidden;
             }
-            h1 {font-size: 2.5vw; margin: 0;}
-            h2 {font-size: 1.33vw; margin: 0;}
-            p, li {font-size: 1.2vw; margin: 1em 0;}
+            #container {
+                margin: auto;
+                width: 90%;
+            }
+            h1 {font-size: max(2.5vw, 18px); margin: 0;}
+            h2 {font-size: max(1.33vw, 15px); margin: 0;}
+
+            @media only screen and (min-width: 768px) {
+                #container {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: unset;
+                    transform: translate(-50%, -50%);
+                }
+            }
         </style>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="Welcome to motemote: a realtime Conway's Game of Life implemented with twitch chat emotes. Add it as a browser source in OBS and let your viewers do the rest.">
         <title>motemote: <%= channel %></title>
     </head>
     <body>
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div id="container">
             <h1 id="errorHeader" style="color: grey;" hidden></h1>
             <h2 id="errorDesc" style="color: grey;" hidden></h2>
         </div>

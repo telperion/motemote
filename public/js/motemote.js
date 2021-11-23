@@ -53,7 +53,7 @@ for (x = 0; x < gw; x++)
     // age: progression thru lifetime (0 = birth, 1 = death)
     // front: whether it's on the "frontline"
     //        (part of the most recent iteration)
-    grid[x*gh + y] = {'id': -1, 'age': 0, 'front': false};
+    grid[x*gh + y] = {'id': '', 'age': 0, 'front': false};
   }
 }
 
@@ -113,12 +113,20 @@ client.on('message', (channel, tags, message, self) => {
       if (!(id in emotesKnown))
       {
         // Only load emotes that are new (duplicates would be so taxing...)
-        console.log(`${id}: ${emotes[id]}`);
+        console.log(`${id}: ${emotes[id]} (New!)`);
         // NOTE: the image has to have enough time to load before drawing!
         // I think this may be causing occasional crashes as it stands now.
         // Need to monitor img.onload...
+        let emoteSrc = `https://static-cdn.jtvnw.net/emoticons/v2/${id}/static/dark/2.0`;
         emotesKnown[id] = new Image();
-        emotesKnown[id].src = `https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`
+        emotesKnown[id].onload = function() {
+          console.log(`Loaded ${emoteSrc}`)
+        }
+        emotesKnown[id].src = emoteSrc
+      }
+      else
+      {
+        console.log(`${id}: ${emotes[id]}`);
       }
 
       for (substrIndex in emotes[id])
@@ -165,7 +173,7 @@ function updateAge()
     {
       // If the cells are too old to show up,
       // they no longer need an emote attached.
-      grid[i]['id'] = -1;
+      grid[i]['id'] = '';
     }
   }
 
@@ -185,7 +193,7 @@ function updateCanvas()
       // Draw each square only if there's an emote identified for it
       // and the emote is of age.
       g = grid[x*gh + y];
-      if ((g['id'] > 0) && (g['age'] >= 0) && (g['age'] < 1))
+      if ((g['id'] != '') && (g['age'] >= 0) && (g['age'] < 1))
       {
         // The emote swells to fill its space as it "ages",
         // then disappears gradually toward the end of its display life.
@@ -235,7 +243,7 @@ function updateLife()
       for (let n of neighbors)
       {
         life += n['front'];
-        if (n['id'] >= 0)
+        if (n['id'] != '')
         {
           // We have to make two passes anyway
           // (initialize emojis present then count),
@@ -264,7 +272,7 @@ function updateLife()
         // buuuuuut I think it works well enough lol
         for (let n of neighbors)
         {
-          if (n['id'] >= 0)
+          if (n['id'] != '')
           {
             // The older the age, the smaller the contribution.
             idWinner[n['id']] += 1 / (1 + n['age']);
