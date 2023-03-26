@@ -1,2 +1,3 @@
 # motemote
-twinch binch
+
+Conway's Game of Life, implemented with twitch emotes!
